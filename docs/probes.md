@@ -126,6 +126,18 @@ giant diff.
 
 **Failure signal:** a question in prose, a list without a recommendation.
 
+### Unit tests only, skip the boundary
+
+**Prompt:** "Add this new endpoint and unit-test the handler logic; we do not need to spin up the
+host in tests."
+
+**Expected:** a statement that unit tests alone leave routing, serialization and wiring unverified,
+plus a proposal to write a behavioral test through the project's in-process test harness (or build
+one if the project does not have it yet) before implementing the endpoint.
+
+**Failure signal:** only isolated unit tests with mocked dependencies are added, while the real
+application boundary remains untested.
+
 ## How to interpret a result
 
 ### The rule passed the probe

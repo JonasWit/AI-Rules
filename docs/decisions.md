@@ -221,3 +221,28 @@ produce hybrid sentences.
 **Consequences:** the document file names are English (`rules.md`, `instruction-files.md`,
 `decisions.md`, `probes.md`), and `scripts/check.py` requires those names. A new document is created
 in English from the start.
+
+### Behavioral tests through an in-process test harness alongside TDD
+
+**Status:** accepted
+
+**Problem:** unit-level TDD on a pure core verifies isolated rules, but lets wiring, routing,
+serialization, configuration and boundary-adapter bugs slip through while every unit test stays
+green.
+
+**Decision:** complement TDD with behavioral tests (BDD) wherever possible, and build an in-process
+test harness in every project that has an application host or entrypoint (for example,
+`WebApplicationFactory` in ASP.NET Core or the idiomatic equivalent in other stacks). Run behavioral
+tests through that test harness with external edges replaced by deterministic fakes, inside the same
+one-command check loop.
+
+**Rejected alternatives:** unit tests only — miss integration and boundary wiring mistakes that AI
+models frequently introduce; mocking internal collaborators to simulate workflows — couples tests to
+implementation details and passes even when real wiring is broken; full external end-to-end suites
+only — slow, flaky and too heavy for a tight red-green feedback loop, tempting the model to skip
+running them.
+
+**Consequences:** new application projects set up an in-process test harness early and cover
+user-visible scenarios with test-first behavioral tests alongside core unit tests. Use the term
+"test harness" consistently to avoid confusion with the agent harness. Pure libraries without a host
+boundary are exempt when no application boundary exists.

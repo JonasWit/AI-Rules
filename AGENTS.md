@@ -18,6 +18,8 @@ Read these before editing anything:
   behavior: documentation content, comments, commit messages, tool-enforced formatting.
 - Watch the test fail before implementing. A test that passed before the change
   proves nothing.
+- Pair TDD with behavioral tests (BDD) through an in-process test harness wherever
+  a project has a host or entrypoint.
 - No claim without a test. Otherwise state "unverified" and what is missing.
 - Run `uv run python scripts/check.py` before committing and paste the raw output.
 - Scripts and tests are Python, managed by `uv`. Tests use `pytest`. Do not add a

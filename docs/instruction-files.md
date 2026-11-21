@@ -187,7 +187,8 @@ Sources: [Claude Code](https://code.claude.com/docs/en/memory),
 
 ### What moves unchanged
 
-- Verification requirements: test before code, an observed red phase, no claims without evidence.
+- Verification requirements: test before code, an observed red phase, no claims without evidence,
+  behavioral tests (BDD) through an in-process test harness alongside TDD where applicable.
 - Code properties: a pure core, validation at the boundary, closed variants, errors as values.
 - Process: one change, one purpose; a new pattern with a decision-log entry; asking instead of
   guessing.
@@ -274,6 +275,7 @@ Read docs/<rules>.md before writing code.
 
 - Test before code, no exceptions except changes with no executable behavior.
 - Watch the test fail before implementing.
+- Pair TDD with behavioral tests (BDD) through an in-process test harness where the project has an application boundary.
 - No claim without a test; otherwise mark it "unverified".
 - Run `./scripts/check` and paste the raw output.
 

@@ -5,6 +5,8 @@
 - Test before code, without exceptions. The only exception: changes with no executable behavior
   — documentation, comments, commit messages, tool-enforced formatting.
 - The red phase must be observed. A test that passed before the change proves nothing.
+- Pair TDD with behavioral tests (BDD) through an in-process test harness wherever the project has
+  an application boundary.
 - A claim without a test is a hypothesis. "Works", "fixed", "done" require the name of the test
   that confirms it.
 - A pure core: state as an argument, a new value instead of mutation, side effects in thin adapters.
@@ -47,6 +49,10 @@ work well.
 - **Port and adapter** — `interface`, `Protocol`, `trait`, a higher-order function: whatever the
   language offers as a contract.
 - **Pure function** — no mutation and no I/O, regardless of whether the language enforces it.
+- **In-process test harness** — `WebApplicationFactory` (ASP.NET Core / .NET), `TestClient` or an
+  in-memory ASGI/WSGI transport (Python), `httptest.Server` (Go), `supertest` or `app.inject`
+  (Node.js), `MockMvc` / `TestRestTemplate` (JVM), or an in-memory CLI/entrypoint runner: whatever
+  boots the real application boundary in memory with external edges replaced by deterministic fakes.
 
 The author's tooling preferences (Python and `uv` for helper scripts and tests) are a choice of
 environment, not an architectural rule. A project with its own toolchain keeps it.
@@ -163,6 +169,40 @@ One test corresponds to one rule. The test name is a sentence in domain language
 behavior is guaranteed. Reading the list of test names should be enough to reconstruct the
 requirements without reading the implementation. That way a failing test tells the agent exactly
 what stopped working, instead of forcing it to trace the code.
+
+### Behavioral tests alongside TDD (BDD)
+
+Unit-level TDD on the pure core proves individual rules in isolation, not that the whole
+application behaves as required when wired together. A model regularly passes every core unit test
+while leaving a route unwired, a serialization contract mismatched, middleware misordered, or a
+boundary adapter swallowing an error.
+
+Alongside TDD, apply Behavior-Driven Development (BDD) wherever possible: write higher-level
+behavioral tests that exercise observable scenarios from the outside — across the real application
+boundary (HTTP endpoint, CLI command, message handler, public workflow). Express each test in
+domain language around preconditions, trigger, and observable outcome (Given / When / Then), rather
+than asserting internal calls or implementation details.
+
+Behavioral tests follow the same rules as unit tests: written before the implementation, observed
+red first, deterministic, and executed by the single check command. Pure libraries or standalone
+functions without an application boundary may rely on core tests alone; applications, services, and
+CLIs need both levels.
+
+### An in-process test harness in every project
+
+Whenever a project has a host, runtime boundary, or composition root, build a reusable in-process
+test harness so behavioral tests can boot the real application inside the test process — for
+example, `WebApplicationFactory` in ASP.NET Core or the idiomatic equivalent in the project's
+stack.
+
+The test harness runs the real application pipeline — routing, validation, serialization,
+configuration, and core logic — and replaces only external I/O edges (external HTTP APIs, real
+clocks, randomness, third-party services, or external storage where appropriate) with deterministic
+fakes or isolated test doubles. Keep each test isolated so no mutable state leaks across scenarios,
+and run the suite inside the project's single check command.
+
+Without an in-process test harness, behavioral tests either fall back to brittle mocks that hide
+wiring bugs, or depend on slow external environments that invite the model to skip running them.
 
 ## Core style
 
