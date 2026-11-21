@@ -51,8 +51,11 @@ Read these before editing anything:
 ## Structure
 
 - `docs/` — the knowledge itself
+- `rules/` — always-on distilled rules (`AGENTS.md`) bundled with the plugin
+- `skills/` — portable Agent Skills (`SKILL.md`) shared across harnesses
+- `.antigravity-plugin/`, `.claude-plugin/`, `.codex-plugin/`, `.agents/plugins/` — thin per-harness manifests
 - `scripts/` — tooling in Python, with pytest tests in `scripts/tests/`
-- `AGENTS.md` — shared rules read by most harnesses
+- `AGENTS.md` — shared rules for maintaining this repository
 - `CLAUDE.md` — thin Claude Code adapter that imports `AGENTS.md`
 - `.githooks/` — git hooks, enabled through `core.hooksPath`
 - `.github/` — pull request template

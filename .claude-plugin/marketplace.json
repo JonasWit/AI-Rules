@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ai-rules",
+  "description": "AI Rules — engineering, testing, and instruction-file discipline for AI coding agents.",
+  "owner": {
+    "name": "JonasWit"
+  },
+  "plugins": [
+    {
+      "name": "ai-rules",
+      "description": "Language-agnostic engineering, testing (TDD, BDD with in-process test harness, deliberate E2E), and agent working rules that reduce AI coding mistakes.",
+      "version": "1.0.0",
+      "author": {
+        "name": "JonasWit",
+        "url": "https://github.com/JonasWit"
+      },
+      "source": "./"
+    }
+  ]
+}

@@ -270,3 +270,29 @@ instead of unit and in-process tests — destroys feedback speed.
 **Consequences:** agents must evaluate E2E coverage explicitly rather than skipping it by reflex,
 set up E2E tooling when it adds real confidence, and reserve the term "end-to-end (E2E)" for tests
 against the real built application (distinguishing them clearly from in-process behavioral tests).
+
+### Multi-harness plugin and skills packaging from one repository
+
+**Status:** accepted
+
+**Problem:** copying rules and workflows by hand into each project or agent tool slows adoption and
+lets local copies drift across Google Antigravity, Claude Code, and OpenAI Codex.
+
+**Decision:** package this repository as one cross-harness `ai-rules` plugin bundle with shared
+always-on rules in `rules/AGENTS.md`, four portable Agent Skills in `skills/` (`ai-rules`,
+`ai-rules-adopt`, `ai-rules-audit`, `ai-rules-decision`), and thin platform-specific manifests
+(`.antigravity-plugin/plugin.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`,
+`.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json`) all pointing to the repository
+root. Enforce manifest validity, Antigravity allowed keys, skill frontmatter, plain-Markdown
+`rules/AGENTS.md`, and version synchronization with `pyproject.toml` inside `scripts/check.py`.
+
+**Rejected alternatives:** maintaining separate repositories per harness — duplicates content and
+guarantees divergence; putting a single root `plugin.json` shared by Antigravity and Codex — risks
+schema mismatches where unknown top-level keys are silently dropped by Antigravity's loader;
+shipping only skills without `rules/AGENTS.md` — violates the distinction between always-on
+prohibitions and on-demand procedures in `docs/instruction-files.md`.
+
+**Consequences:** every release bumps `version` in `pyproject.toml` and all plugin manifests
+together (enforced by `scripts/check.py`). Adding a new skill means adding `skills/<name>/SKILL.md`
+with matching kebab-case frontmatter. Platform-specific manifest quirks stay in their own hidden
+manifest directory rather than leaking into canonical docs.

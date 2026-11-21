@@ -31,6 +31,51 @@ The rules are language-agnostic. Types, contracts and error handling translate i
 the language the project is written in. The author's tooling preference (Python, `uv`, `pytest` for
 helper scripts) is described separately and is not an architectural rule.
 
+## Install as a plugin or skills
+
+This repository ships as a single cross-harness plugin bundle (`ai-rules`) containing always-on
+distilled rules ([`rules/AGENTS.md`](rules/AGENTS.md)) and four portable Agent Skills
+([`skills/`](skills/ai-rules/SKILL.md)): `ai-rules`, `ai-rules-adopt`, `ai-rules-audit`, and
+`ai-rules-decision`.
+
+### Google Antigravity
+
+Install the full plugin (auto-loads `rules/AGENTS.md` and all four skills):
+
+```sh
+agy plugin install https://github.com/JonasWit/AI-Rules
+```
+
+### Claude Code
+
+Register this repository as a plugin marketplace and install the plugin:
+
+```text
+/plugin marketplace add JonasWit/AI-Rules
+/plugin install ai-rules@ai-rules
+```
+
+To also apply the always-on rules globally in Claude Code, copy [`rules/AGENTS.md`](rules/AGENTS.md)
+into `~/.claude/CLAUDE.md` (or import it).
+
+### OpenAI Codex
+
+Install the portable Agent Skills via the open `skills` CLI (or register this repository via
+`.agents/plugins/marketplace.json` / `.codex-plugin/plugin.json`):
+
+```sh
+npx skills add JonasWit/AI-Rules
+```
+
+To also apply the always-on rules globally in Codex, copy [`rules/AGENTS.md`](rules/AGENTS.md) into
+`~/.codex/AGENTS.md`.
+
+### Any Agent Skills-compatible harness (Cursor, OpenCode, Gemini CLI, etc.)
+
+```sh
+npx skills add JonasWit/AI-Rules
+```
+
 ## Start in a minute
 
 ```sh
@@ -40,7 +85,7 @@ uv run python scripts/check.py
 ```
 
 The last command checks repository consistency: required files, dead links, forbidden markers,
-file size budgets and project tests.
+file size budgets, plugin manifests, skill frontmatter, and project tests.
 
 ## Pick your path
 
@@ -71,13 +116,19 @@ Details, differences and portability traps: [`docs/instruction-files.md`](docs/i
 ## What is inside
 
 ```
-docs/            knowledge: rules, distribution to instruction files, decisions, probes
-examples/kotlin/ golden example of a pure core (TimerEngine)
-scripts/         one check command plus its pytest suite
-AGENTS.md        shared rules for every harness
-CLAUDE.md        thin Claude Code adapter: imports AGENTS.md
-.githooks/       commit-msg hook that demands evidence in the commit
-.github/         pull request template with the definition of done
+.antigravity-plugin/  Google Antigravity plugin manifest
+.claude-plugin/       Claude Code plugin and marketplace manifests
+.codex-plugin/        OpenAI Codex plugin manifest
+.agents/plugins/      OpenAI Codex / Agent Plugins marketplace catalog
+rules/                always-on distilled universal rules (AGENTS.md) bundled with the plugin
+skills/               portable Agent Skills (ai-rules, ai-rules-adopt, ai-rules-audit, ai-rules-decision)
+docs/                 knowledge: rules, distribution to instruction files, decisions, probes
+examples/kotlin/      golden example of a pure core (TimerEngine)
+scripts/              one check command plus its pytest suite
+AGENTS.md             repository rules for maintaining AI-Rules itself
+CLAUDE.md             thin Claude Code adapter: imports AGENTS.md
+.githooks/            commit-msg hook that demands evidence in the commit
+.github/              pull request template with the definition of done
 ```
 
 ## Preferred choices
@@ -177,7 +228,7 @@ together with the list of cues to play. That is why the test needs neither real 
 
 | Mechanism | What it blocks |
 | --- | --- |
-| [`scripts/check.py`](scripts/check.py) | Missing documents, dead links, forbidden markers, oversized files, failing project tests |
+| [`scripts/check.py`](scripts/check.py) | Missing documents, dead links, forbidden markers, oversized files, invalid plugin manifests or skill frontmatter, version drift, failing project tests |
 | `uv run pytest` | Regressions in the check script itself |
 | `.githooks/commit-msg` | Commits without a `Test:` or `Unverified:` line |
 | `.github/pull_request_template.md` | Pull requests that skip the definition of done |

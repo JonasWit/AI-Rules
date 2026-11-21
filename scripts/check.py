@@ -20,6 +20,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
+import plugin_checks  # noqa: E402
+
 REQUIRED_FILES = (
     "README.md",
     "AGENTS.md",
@@ -147,6 +153,13 @@ def check_file_size(root: Path) -> CheckResult:
     return CheckResult.from_problems("file size", problems)
 
 
+def check_plugin_manifests(root: Path) -> CheckResult:
+    problems = plugin_checks.find_plugin_problems(root)
+    if problems is None:
+        return CheckResult.skipped("plugin manifests")
+    return CheckResult.from_problems("plugin manifests", problems)
+
+
 def stack_commands(root: Path) -> list[tuple[str, list[str]]]:
     commands: list[tuple[str, list[str]]] = []
     if (root / "package.json").exists() and shutil.which("npm"):
@@ -212,6 +225,7 @@ def main(argv: list[str] | None = None) -> int:
         check_markdown_links(root),
         check_forbidden_markers(root),
         check_file_size(root),
+        check_plugin_manifests(root),
         check_stack(root),
     ]
     print(render(root, results))

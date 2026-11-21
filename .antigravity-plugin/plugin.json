@@ -1,0 +1,18 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "ai-rules",
+  "displayName": "AI Rules",
+  "version": "1.0.0",
+  "description": "Language-agnostic engineering, testing (TDD, BDD with in-process test harness, deliberate E2E), and agent working rules that reduce AI coding mistakes.",
+  "author": {
+    "name": "JonasWit",
+    "url": "https://github.com/JonasWit"
+  },
+  "homepage": "https://github.com/JonasWit/AI-Rules",
+  "repository": "https://github.com/JonasWit/AI-Rules",
+  "suggestedPrompts": [
+    "Adopt AI Rules in this repository and set up the check command and commit hook",
+    "Audit this codebase and its instruction files against AI Rules",
+    "Record a new architectural pattern decision in docs/decisions.md"
+  ]
+}

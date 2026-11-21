@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "ai-rules",
+  "version": "1.0.0",
+  "description": "Language-agnostic engineering, testing (TDD, BDD with in-process test harness, deliberate E2E), and agent working rules that reduce AI coding mistakes.",
+  "author": {
+    "name": "JonasWit",
+    "url": "https://github.com/JonasWit"
+  },
+  "homepage": "https://github.com/JonasWit/AI-Rules",
+  "repository": "https://github.com/JonasWit/AI-Rules",
+  "license": "MIT",
+  "keywords": [
+    "ai-rules",
+    "tdd",
+    "bdd",
+    "e2e",
+    "testing",
+    "architecture",
+    "agents-md",
+    "code-quality"
+  ]
+}

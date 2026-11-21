@@ -66,6 +66,11 @@ do not consume context until needed. Disadvantage — they must be invoked, so t
 rules that must always apply. Critical rules stay in instruction files; skills are for activities,
 not prohibitions.
 
+This repository packages both layers as a cross-harness plugin (`ai-rules`): always-on distilled
+rules in [`rules/AGENTS.md`](../rules/AGENTS.md) and four on-demand Agent Skills in `skills/`
+(`ai-rules`, `ai-rules-adopt`, `ai-rules-audit`, `ai-rules-decision`), wired through thin manifests
+for Google Antigravity, Claude Code, OpenAI Codex, and the open `skills` CLI.
+
 ## What goes where
 
 | Content | Location | Why |
