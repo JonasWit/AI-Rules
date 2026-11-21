@@ -7,6 +7,8 @@
 - The red phase must be observed. A test that passed before the change proves nothing.
 - Pair TDD with behavioral tests (BDD) through an in-process test harness wherever the project has
   an application boundary.
+- Deliberately evaluate end-to-end (E2E) tests whenever real UI, runtime, or integration behavior
+  matters; set them up when the added confidence justifies the cost, never dismiss them by default.
 - A claim without a test is a hypothesis. "Works", "fixed", "done" require the name of the test
   that confirms it.
 - A pure core: state as an argument, a new value instead of mutation, side effects in thin adapters.
@@ -53,6 +55,10 @@ work well.
   in-memory ASGI/WSGI transport (Python), `httptest.Server` (Go), `supertest` or `app.inject`
   (Node.js), `MockMvc` / `TestRestTemplate` (JVM), or an in-memory CLI/entrypoint runner: whatever
   boots the real application boundary in memory with external edges replaced by deterministic fakes.
+- **End-to-end (E2E) tests** — Playwright or another real browser runner (web apps), desktop or
+  mobile UI automation (native apps), executing the compiled CLI binary in an isolated workspace
+  (CLIs), or running the packaged service against isolated local infrastructure such as ephemeral
+  containers or databases: whatever exercises the real built application the way a user runs it.
 
 The author's tooling preferences (Python and `uv` for helper scripts and tests) are a choice of
 environment, not an architectural rule. A project with its own toolchain keeps it.
@@ -203,6 +209,32 @@ and run the suite inside the project's single check command.
 
 Without an in-process test harness, behavioral tests either fall back to brittle mocks that hide
 wiring bugs, or depend on slow external environments that invite the model to skip running them.
+
+### End-to-end (E2E) tests where they add real confidence
+
+Unit tests and in-process behavioral tests cannot catch every defect. Some bugs appear only in the
+real running application: broken UI layout or visual regressions, browser/DOM/CSS/JavaScript
+interaction failures, packaging and startup errors, real database migrations or query dialects,
+OS-level process behavior, or authentication and network wiring across real boundaries.
+
+Do not reject end-to-end (E2E) tests by default. Treat them as an explicit, language-independent
+option with a strong requirement to evaluate honestly whether setting them up and running them
+provides real additional confidence that the code, UI, and overall application behave as expected.
+Whenever the payoff is real — for example, user-facing web/mobile/desktop interfaces, compiled
+CLIs, or critical end-to-end user flows — set up idiomatic E2E tests for the project's stack and
+cover those critical journeys.
+
+Keep E2E tests focused, additive, and practical:
+
+- E2E tests complement unit TDD and in-process behavioral tests; they never replace the fast
+  in-process red-green loop.
+- Target high-value user journeys, visual/UI behavior, and real runtime boundaries instead of
+  duplicating combinatorics already proven in pure core tests.
+- Isolate test state and environment so runs stay repeatable rather than flaky.
+- Wire them into a documented command — inside the single check command when fast enough, or as an
+  explicit E2E command and CI stage when heavier — and never leave the choice implicit: if E2E
+  tests are skipped for a project with a user-facing or runtime boundary, state the concrete reason
+  explicitly (and record project-wide decisions in `docs/decisions.md`).
 
 ## Core style
 

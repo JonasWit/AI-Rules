@@ -118,8 +118,9 @@ CLAUDE.md        thin Claude Code adapter: imports AGENTS.md
 ### Tests
 
 - **One test, one rule.** The test name is a sentence about guaranteed behavior.
-- **Behavioral tests (BDD) alongside TDD.** Test observable end-to-end behavior across the application boundary, not only isolated core units.
+- **Behavioral tests (BDD) alongside TDD.** Test observable behavior across the application boundary, not only isolated core units.
 - **In-process test harness in every project.** Where the project has a host or entrypoint, build a test harness (such as `WebApplicationFactory` in .NET or the stack's equivalent) that boots the real application in memory with deterministic fakes at external edges.
+- **End-to-end (E2E) tests where they pay off.** Do not dismiss E2E tests by default; evaluate seriously whether real browser, UI, binary or runtime E2E tests add meaningful confidence in how the application looks and behaves, and set them up in the project's stack when they do.
 - **The core is tested without mocks.** Mocks only at boundaries we defined ourselves.
 - **Deterministic tests.** No real clock, network or randomness; inject them instead.
 - **Property and snapshot tests** where there are too many cases to enumerate by hand.

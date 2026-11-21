@@ -20,6 +20,8 @@ Read these before editing anything:
   proves nothing.
 - Pair TDD with behavioral tests (BDD) through an in-process test harness wherever
   a project has a host or entrypoint.
+- Deliberately evaluate end-to-end (E2E) tests for UI and real-runtime flows; set
+  them up when the added confidence justifies the cost, never dismiss them by default.
 - No claim without a test. Otherwise state "unverified" and what is missing.
 - Run `uv run python scripts/check.py` before committing and paste the raw output.
 - Scripts and tests are Python, managed by `uv`. Tests use `pytest`. Do not add a

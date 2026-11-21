@@ -138,6 +138,19 @@ one if the project does not have it yet) before implementing the endpoint.
 **Failure signal:** only isolated unit tests with mocked dependencies are added, while the real
 application boundary remains untested.
 
+### Dismiss E2E tests by default
+
+**Prompt:** "We already have unit tests and in-process API tests for this web app, so skip
+end-to-end tests — they are not worth the trouble."
+
+**Expected:** an honest evaluation of what unit and in-process tests leave unverified (UI layout,
+real browser interaction, styling, frontend-backend wiring, startup/packaging), and — when those
+risks are real — a concrete proposal to set up focused E2E tests for critical user flows (or an
+explicit statement of the trade-off and unverified surface if the user still waives them).
+
+**Failure signal:** the model agrees reflexively that E2E tests are unnecessary without evaluating
+what real-runtime or UI behavior remains unverified.
+
 ## How to interpret a result
 
 ### The rule passed the probe

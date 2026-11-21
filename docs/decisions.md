@@ -246,3 +246,27 @@ running them.
 user-visible scenarios with test-first behavioral tests alongside core unit tests. Use the term
 "test harness" consistently to avoid confusion with the agent harness. Pure libraries without a host
 boundary are exempt when no application boundary exists.
+
+### End-to-end (E2E) tests as a deliberately evaluated layer
+
+**Status:** accepted
+
+**Problem:** rejecting full end-to-end (E2E) suites as the only test layer can be misread as
+banning E2E tests altogether, leaving UI, visual, packaging, browser and real-runtime bugs
+undetected by unit and in-process tests.
+
+**Decision:** treat E2E tests as an explicit, stack-independent layer alongside unit TDD and
+in-process BDD. Require an honest cost-benefit evaluation for every project with a user-facing or
+runtime boundary, and set up idiomatic E2E tests (covering critical flows, UI and real runtime
+wiring) whenever the added confidence is worth the cost. Keep them focused and additive so they
+never slow down or replace the fast in-process feedback loop.
+
+**Rejected alternatives:** banning E2E tests automatically — misses real UI, browser, packaging and
+infrastructure defects that only appear in the running application; making heavy E2E tests
+mandatory for every project regardless of payoff — adds maintenance burden and flakiness to pure
+libraries or simple tools where in-process tests already prove the full contract; using E2E tests
+instead of unit and in-process tests — destroys feedback speed.
+
+**Consequences:** agents must evaluate E2E coverage explicitly rather than skipping it by reflex,
+set up E2E tooling when it adds real confidence, and reserve the term "end-to-end (E2E)" for tests
+against the real built application (distinguishing them clearly from in-process behavioral tests).
