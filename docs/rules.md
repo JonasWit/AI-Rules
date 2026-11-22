@@ -59,6 +59,11 @@ work well.
   mobile UI automation (native apps), executing the compiled CLI binary in an isolated workspace
   (CLIs), or running the packaged service against isolated local infrastructure such as ephemeral
   containers or databases: whatever exercises the real built application the way a user runs it.
+- **Vertical slice** — a feature folder or single module per use case (`orders/create_order`,
+  `orders/cancel_order`) with explicit route/command registration and direct calls (ASP.NET Core
+  minimal endpoints without MediatR, FastAPI/Python router + pure functions, Go feature package,
+  TypeScript/Node feature module, Rust/JVM feature module): whatever co-locates one user-visible
+  capability without horizontal technical layers or mediator magic.
 
 The author's tooling preferences (Python and `uv` for helper scripts and tests) are a choice of
 environment, not an architectural rule. A project with its own toolchain keeps it.
@@ -293,6 +298,35 @@ Logic is pure and testable without an environment. The whole environment — inp
 configuration, time — lives in one thin place, usually at the bottom of the file. A model editing
 logic then has no temptation to touch I/O, and one editing I/O does not need to understand the logic.
 
+### Vertical slices by feature, shared pure core for domain rules
+
+In applications organized around user-facing features, endpoints, commands, or workflows (APIs, web
+apps, CLIs, backend services), prefer **vertical slices** grouped by use case inside domain
+boundaries (`orders/create_order`, `orders/cancel_order`, `orders/get_order`) instead of horizontal
+technical layers (`controllers/`, `services/`, `repositories/`, `dtos/`) or god-services such as
+`OrderService`.
+
+Vertical slices lower context cost and maximize change locality: adding, editing, or deleting a
+capability touches one slice (plus at most one explicit registration line) instead of five
+scattered layers, and each slice maps naturally to behavioral tests through the in-process test
+harness.
+
+Keep three guardrails strict so vertical slices do not collide with the rest of these rules:
+
+- **Slice-local glue versus one source of truth for business rules.** Keep request/response DTOs,
+  boundary parsing, endpoint or CLI wiring, and read-only projections local to each slice — do not
+  prematurely share them. Keep business invariants, calculations, state transitions, and domain
+  types used by two or more slices in one shared pure domain core (for example, `orders/core`);
+  never copy-paste business rules across slices.
+- **Explicit wiring, no mediator magic.** A vertical slice is a code-organization boundary, not a
+  framework. Wire slices with explicit registration and direct function calls — do not introduce
+  MediatR, implicit command buses, assembly scanning, or hidden pipeline behaviors.
+- **Stay within the file size budget and scope.** A small slice fits in one file following the
+  fixed skeleton (`types`, pure functions, thin adapter). When a slice grows, keep it as a slice
+  folder with small, focused files. Pure libraries, parsers, algorithms, and single-engine modules
+  without application workflows stay organized around cohesive domain types and pure functions
+  instead of artificial request slices.
+
 ### A pipeline of small steps
 
 A complex transformation is a sequence of small, pure functions with one input and one output. A new
@@ -389,8 +423,10 @@ model cannot predict what will happen, so it cannot safely change the code.
 ### Layers for layers
 
 Every additional layer of abstraction costs context and is one more place to confuse where the logic
-belongs. Two, at most three layers. Names like `AbstractFactoryBuilderProxy` are a signal that the
-project has slipped out of control.
+belongs. Two, at most three layers. Horizontal technical folders (`controllers/`, `services/`,
+`repositories/`) and multi-feature god-services such as `OrderService` are the most common form of
+this anti-pattern; prefer vertical slices by use case with a thin shared pure core instead. Names
+like `AbstractFactoryBuilderProxy` are a signal that the project has slipped out of control.
 
 ### `utils` and `helpers` bags
 

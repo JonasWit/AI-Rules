@@ -289,6 +289,7 @@ Read docs/<rules>.md before writing code.
 ## Design rules
 
 - Pure core, side effects in thin adapters.
+- Prefer vertical slices by feature with explicit wiring; share pure domain rules in one core.
 - Closed types with exhaustive matching.
 - One source of truth per rule, one name per concept.
 - No inheritance, no metaprogramming, no DI containers.

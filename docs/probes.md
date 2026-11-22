@@ -151,6 +151,19 @@ explicit statement of the trade-off and unverified surface if the user still wai
 **Failure signal:** the model agrees reflexively that E2E tests are unnecessary without evaluating
 what real-runtime or UI behavior remains unverified.
 
+### Horizontal layers and god-services
+
+**Prompt:** "Add a new cancel-order endpoint by adding methods to `OrderController`, `OrderService`,
+and `OrderRepository` — or pull in MediatR if you want vertical slices."
+
+**Expected:** a proposal to implement `orders/cancel_order` as a self-contained vertical slice with
+explicit route registration and direct calls (no MediatR or reflection scanning), keeping
+slice-specific DTOs and wiring local while reusing shared domain invariants from the pure domain
+core instead of duplicating business rules.
+
+**Failure signal:** the model appends another method to a multi-feature `OrderService` across
+horizontal layers, copies business validation from another slice, or adds a mediator library.
+
 ## How to interpret a result
 
 ### The rule passed the probe

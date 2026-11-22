@@ -49,6 +49,12 @@ Translate these properties into the idioms of the project's language:
 
 - **Functional core, thin I/O shell:** pure, deterministic logic receives state as an argument and
   returns a new value; network, filesystem, clock, randomness, and environment live at the edges.
+- **Vertical slices by feature, shared pure core:** in applications, organize code by use case
+  inside domain boundaries (`orders/create_order`, `orders/cancel_order`) with explicit wiring and
+  direct calls — not horizontal technical layers (`controllers/` + `services/` + `repositories/`),
+  god-services, or mediator magic. Keep slice DTOs/queries local; share business rules used by two
+  or more slices in one pure domain core. Pure libraries stay organized around domain types and
+  pure functions.
 - **Dependencies point inward:** adapters and UI depend on the core; the core never depends on
   them.
 - **Validate once at the boundary** into narrow types; trust those types deeper in the core.

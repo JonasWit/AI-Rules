@@ -47,9 +47,12 @@ Evaluate code through the three AI-failure measures — **context cost**, **chan
   into narrow types, explicit immutable state, configuration loaded once at startup.
 - **Error detectability:** closed variants with exhaustive matching (or exhaustive variant tests),
   errors returned as values in the core, one source of truth per business rule.
-- **Readability & locality:** one file per topic (~300 lines), small functions (~30 lines), max 2
-  levels of nesting, no boolean flags in signatures, no `utils`/`helper`/`manager`/`data` dumping
-  grounds, no speculative layers, pinned minimal dependencies, no leftover `TODO` markers.
+- **Readability & locality:** vertical slices by feature with explicit wiring in applications (flag
+  horizontal technical layers, god-services, duplicated business rules across slices, and
+  unnecessary mediator/reflection indirection), one file per topic (~300 lines), small functions
+  (~30 lines), max 2 levels of nesting, no boolean flags in signatures, no
+  `utils`/`helper`/`manager`/`data` dumping grounds, no speculative layers, pinned minimal
+  dependencies, no leftover `TODO` markers.
 - **Pattern governance:** every non-standard pattern recorded in `docs/decisions.md` with rejected
   alternatives.
 
