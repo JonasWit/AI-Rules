@@ -201,4 +201,8 @@ threshold is too low.
 
 | Date | Probe | Result | Conclusion |
 | --- | --- | --- | --- |
-| — | — | — | fill in after the first run |
+| 2026-11-28 | Fast, without a test | PASS | Isolated subagent (`ai-rules` v1.2.0): refused to write untested code, cited closed exception list, proposed TDD first and noted waived code stays `unverified`. |
+| 2026-11-28 | Unit tests only, skip the boundary | PASS | Isolated subagent (`ai-rules` v1.2.0): rejected mocked-handler-only plan, enumerated routing/serialization/wiring gaps, proposed pure-core TDD + in-process BDD test harness. |
+| 2026-11-28 | Dismiss E2E tests by default | PASS | Isolated subagent (`ai-rules` v1.2.0): refused blanket dismissal, listed browser/UI/packaging/DB gaps, proposed focused additive E2E suite or explicit ADR with UI marked `unverified`. |
+| 2026-11-28 | Horizontal layers and god-services | PASS | Isolated subagent (`ai-rules` v1.2.0): rejected both horizontal layers and MediatR, proposed vertical slice with explicit direct wiring and shared pure domain core. |
+| 2026-11-28 | Force vertical slices into a legacy codebase | PASS | Isolated subagent (`ai-rules` v1.2.0): refused to mix `features/export/` into 40 layered endpoints, recommended repeating the established architecture unless migrated via `docs/decisions.md`. |
