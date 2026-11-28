@@ -306,20 +306,26 @@ technical layers (`controllers/`, `services/`, `repositories/`) and growing god-
 (`OrderService`) inside each domain, increasing context cost and scattering every feature change
 across many files.
 
-**Decision:** in applications built around user-facing features, endpoints, commands, or workflows,
-prefer vertical slices organized by use case inside domain boundaries (`orders/create_order`,
-`orders/cancel_order`) with explicit registration and direct calls. Keep slice-specific DTOs,
-boundary wiring, and read projections local to each slice, while keeping business rules and
-invariants shared by two or more slices in one pure domain core (`<domain>/core`).
+**Decision:** in greenfield applications built around user-facing features, endpoints, commands, or
+workflows (and in repositories that already use vertical slices), prefer vertical slices organized
+by use case inside domain boundaries (`orders/create_order`, `orders/cancel_order`) with explicit
+registration and direct calls. In existing or legacy repositories with an established architecture,
+respect that architecture instead of forcing vertical slices in; migrate only through an explicit
+decision recorded in `docs/decisions.md`. Keep slice-specific DTOs, boundary wiring, and read
+projections local to each slice, while keeping business rules and invariants shared by two or more
+slices in one pure domain core (`<domain>/core`).
 
-**Rejected alternatives:** horizontal technical layers — force every change to touch 5+ files and
-leave orphaned DTOs or service methods when features are removed; naive copy-paste vertical slices
-that duplicate business rules — violates "one source of truth per rule" and causes "agent fixed one
-copy" regressions; mediator/reflection-driven vertical slices (such as MediatR or assembly-scanned
-pipelines) — violates "no metaprogramming and magic" by hiding call paths; forcing vertical slices
-onto pure libraries or single-engine modules — adds artificial ceremony where cohesive domain types
-and pure functions fit better.
+**Rejected alternatives:** horizontal technical layers in new projects — force every change to
+touch 5+ files and leave orphaned DTOs or service methods when features are removed; forcing
+vertical slices into existing or legacy repositories — creates a split-brain hybrid architecture
+that violates "find the existing pattern first" and increases context cost; naive copy-paste
+vertical slices that duplicate business rules — violates "one source of truth per rule" and causes
+"agent fixed one copy" regressions; mediator/reflection-driven vertical slices (such as MediatR or
+assembly-scanned pipelines) — violates "no metaprogramming and magic" by hiding call paths; forcing
+vertical slices onto pure libraries or single-engine modules — adds artificial ceremony where
+cohesive domain types and pure functions fit better.
 
-**Consequences:** application features are added, changed, and deleted per slice with explicit
+**Consequences:** new application features are added, changed, and deleted per slice with explicit
 wiring and paired behavioral tests; shared domain rules live in one pure core module per domain;
-pure libraries remain organized around domain types and pure functions.
+existing and legacy repositories keep their established architectural style unless explicitly
+migrated; pure libraries remain organized around domain types and pure functions.

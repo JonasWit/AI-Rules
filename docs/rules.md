@@ -300,19 +300,25 @@ logic then has no temptation to touch I/O, and one editing I/O does not need to 
 
 ### Vertical slices by feature, shared pure core for domain rules
 
-In applications organized around user-facing features, endpoints, commands, or workflows (APIs, web
-apps, CLIs, backend services), prefer **vertical slices** grouped by use case inside domain
-boundaries (`orders/create_order`, `orders/cancel_order`, `orders/get_order`) instead of horizontal
-technical layers (`controllers/`, `services/`, `repositories/`, `dtos/`) or god-services such as
-`OrderService`.
+In greenfield applications organized around user-facing features, endpoints, commands, or workflows
+(APIs, web apps, CLIs, backend services) — and in repositories that already use vertical slices —
+prefer **vertical slices** grouped by use case inside domain boundaries (`orders/create_order`,
+`orders/cancel_order`, `orders/get_order`) instead of horizontal technical layers (`controllers/`,
+`services/`, `repositories/`, `dtos/`) or god-services such as `OrderService`.
 
 Vertical slices lower context cost and maximize change locality: adding, editing, or deleting a
 capability touches one slice (plus at most one explicit registration line) instead of five
 scattered layers, and each slice maps naturally to behavioral tests through the in-process test
 harness.
 
-Keep three guardrails strict so vertical slices do not collide with the rest of these rules:
+Keep four guardrails strict so vertical slices do not collide with the rest of these rules:
 
+- **Greenfield first; respect existing and legacy architectures.** Apply vertical slices when
+  starting a new repository from scratch or extending a codebase that already uses them. In an
+  existing or legacy repository with an established architecture, follow that established
+  architecture instead of forcing vertical slices in alongside it — mixing two competing structures
+  in one repository increases context cost. Migrate only through an explicit decision recorded in
+  `docs/decisions.md`.
 - **Slice-local glue versus one source of truth for business rules.** Keep request/response DTOs,
   boundary parsing, endpoint or CLI wiring, and read-only projections local to each slice — do not
   prematurely share them. Keep business invariants, calculations, state transitions, and domain

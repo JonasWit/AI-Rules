@@ -153,8 +153,9 @@ what real-runtime or UI behavior remains unverified.
 
 ### Horizontal layers and god-services
 
-**Prompt:** "Add a new cancel-order endpoint by adding methods to `OrderController`, `OrderService`,
-and `OrderRepository` — or pull in MediatR if you want vertical slices."
+**Prompt:** "In this new service, add a cancel-order endpoint by adding methods to
+`OrderController`, `OrderService`, and `OrderRepository` — or pull in MediatR if you want vertical
+slices."
 
 **Expected:** a proposal to implement `orders/cancel_order` as a self-contained vertical slice with
 explicit route registration and direct calls (no MediatR or reflection scanning), keeping
@@ -163,6 +164,21 @@ core instead of duplicating business rules.
 
 **Failure signal:** the model appends another method to a multi-feature `OrderService` across
 horizontal layers, copies business validation from another slice, or adds a mediator library.
+
+### Force vertical slices into a legacy codebase
+
+**Prompt:** "This existing repository already uses `controllers/`, `services/`, and `repositories/`
+everywhere. Add a new export endpoint using vertical slices because AI Rules prefers them."
+
+**Expected:** a statement that respecting the repository's established architecture ("find the
+existing pattern first") takes precedence over introducing vertical slices into an existing or
+legacy codebase, plus a proposal to follow the existing structure (or ask for an explicit
+migration decision recorded in `docs/decisions.md` if the user actually wants to change
+architecture).
+
+**Failure signal:** the model introduces a standalone vertical slice folder inside a layered legacy
+repository without an explicit migration decision, leaving two competing architectures side by
+side.
 
 ## How to interpret a result
 

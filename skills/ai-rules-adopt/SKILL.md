@@ -18,6 +18,11 @@ Before creating or editing files, read:
 
 - Existing instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules/`,
   `.github/copilot-instructions.md`) to avoid duplicating or clobbering local rules.
+- The existing codebase architecture (greenfield vs. established or legacy structure). On a
+  greenfield repository, adopt the full AI Rules architectural defaults (including vertical slices
+  where appropriate). On an existing or legacy repository, respect the established architecture —
+  do not force vertical slices or a disruptive rewrite unless the user explicitly asks to migrate
+  and records that decision in `docs/decisions.md`.
 - Build, lint, typecheck, and test configuration (`pyproject.toml`, `package.json`, `*.sln`,
   `go.mod`, `Cargo.toml`, `build.gradle*`, etc.).
 - Existing `docs/` directory and `.githooks/` or CI workflows.
