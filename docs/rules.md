@@ -502,8 +502,10 @@ about uncertainty is a report of false certainty.
 ## Definition of done
 
 A change is done when the test was written before the implementation, went through the red phase and
-then the green one, the project check command passes, no claim in the change description is left
-without a test reference, and dependencies have not grown without justification.
+then the green one, behavioral tests through the in-process test harness cover the boundary where
+one exists, end-to-end (E2E) coverage was deliberately evaluated (and set up or explicitly traded
+off), the project check command passes, no claim in the change description is left without a test
+reference, and dependencies have not grown without justification.
 
 ## Moving rules into tools
 
@@ -512,15 +514,17 @@ A rule that can be checked mechanically is moved into tool configuration. The do
 
 Current state:
 
-- `scripts/check.py` — one command that checks what is checkable without a stack: the presence of
-  required files, dead links in documentation, forbidden markers, the file size budget. When a stack
-  appears, the same command runs its tests.
+- `scripts/check.py` — one local command that checks required files, dead links in documentation,
+  forbidden markers, file size budgets, plugin manifests, skill frontmatter, version
+  synchronization, hook line endings, concept consistency across rule carriers, and the project
+  test suite.
 - Author preference, not an architectural rule: tooling scripts and tests are in Python, managed by
   `uv`, with tests in `pytest`. A project with its own toolchain keeps it.
-- `.githooks/commit-msg` — a commit without a `Test:` or `Unverified: <reason>` line does not exist.
+- `.githooks/commit-msg` — local git hook ensuring every commit carries a `Test:` or
+  `Unverified: <reason>` trailer.
 - PR template with the definition-of-done checklist.
-- CI on PRs and a required status before merging to `main` — to be enabled together with the first
-  stack.
+- Verification in this repository runs locally before every commit and release without hosted CI
+  (recorded in [`docs/decisions.md`](decisions.md)).
 
 To be enforced in configuration once a stack is chosen:
 

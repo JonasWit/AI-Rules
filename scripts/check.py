@@ -24,6 +24,7 @@ SCRIPT_DIR = str(Path(__file__).resolve().parent)
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
+import concept_checks  # noqa: E402
 import plugin_checks  # noqa: E402
 
 REQUIRED_FILES = (
@@ -160,6 +161,14 @@ def check_plugin_manifests(root: Path) -> CheckResult:
     return CheckResult.from_problems("plugin manifests", problems)
 
 
+def check_concept_sync(root: Path) -> CheckResult:
+    active = plugin_checks.has_plugin_layout(root)
+    problems = concept_checks.find_concept_sync_problems(root, active=active)
+    if problems is None:
+        return CheckResult.skipped("concept sync")
+    return CheckResult.from_problems("concept sync", problems)
+
+
 def stack_commands(root: Path) -> list[tuple[str, list[str]]]:
     commands: list[tuple[str, list[str]]] = []
     if (root / "package.json").exists() and shutil.which("npm"):
@@ -226,6 +235,7 @@ def main(argv: list[str] | None = None) -> int:
         check_forbidden_markers(root),
         check_file_size(root),
         check_plugin_manifests(root),
+        check_concept_sync(root),
         check_stack(root),
     ]
     print(render(root, results))

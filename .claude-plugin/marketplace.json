@@ -9,7 +9,7 @@
     {
       "name": "ai-rules",
       "description": "Language-agnostic engineering, testing (TDD, BDD with in-process test harness, deliberate E2E), and agent working rules that reduce AI coding mistakes.",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "author": {
         "name": "JonasWit",
         "url": "https://github.com/JonasWit"

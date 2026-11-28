@@ -92,7 +92,7 @@ file size budgets, plugin manifests, skill frontmatter, and project tests.
 | I want to… | Start with |
 | --- | --- |
 | learn the rules and the reasoning | [`docs/rules.md`](docs/rules.md) |
-| adopt them in my project | [`AGENTS.md`](AGENTS.md), then [`docs/instruction-files.md`](docs/instruction-files.md) |
+| adopt them in my project | [Install as a plugin or skills](#install-as-a-plugin-or-skills), [`rules/AGENTS.md`](rules/AGENTS.md), and [`skills/ai-rules-adopt/`](skills/ai-rules-adopt/SKILL.md) |
 | see what good code looks like | [`examples/kotlin/`](examples/kotlin/README.md) |
 | check whether a model actually follows them | [`docs/probes.md`](docs/probes.md) |
 | see what is enforced mechanically | [`scripts/check.py`](scripts/check.py) |
@@ -222,7 +222,9 @@ together with the list of cues to play. That is why the test needs neither real 
 | [`docs/instruction-files.md`](docs/instruction-files.md) | How to move this knowledge into the instruction file of any harness so it actually works |
 | [`docs/decisions.md`](docs/decisions.md) | Decision log: problem, decision, rejected alternatives, consequences |
 | [`docs/probes.md`](docs/probes.md) | Probes that try to break the rules, to establish which ones actually bind |
-| [`AGENTS.md`](AGENTS.md) | The shared instruction file; [`CLAUDE.md`](CLAUDE.md) imports it for Claude Code |
+| [`rules/AGENTS.md`](rules/AGENTS.md) | Distilled always-on universal rules bundled with the plugin and ready to copy into projects |
+| [`skills/`](skills/ai-rules/SKILL.md) | Portable Agent Skills (`ai-rules`, `ai-rules-adopt`, `ai-rules-audit`, `ai-rules-decision`) |
+| [`AGENTS.md`](AGENTS.md) | Repository instructions for maintaining AI-Rules itself; [`CLAUDE.md`](CLAUDE.md) imports it for Claude Code |
 
 ## Enforcement
 
@@ -253,7 +255,7 @@ uv run pytest
 
 ## Using this in a new project
 
-- Copy [`AGENTS.md`](AGENTS.md) and those documents from `docs/` that fit the project. If your harness reads its own file, add an adapter that imports the shared content instead of copying it.
+- Install the `ai-rules` plugin (or copy [`rules/AGENTS.md`](rules/AGENTS.md) plus those documents from `docs/` that fit the project), then follow [`skills/ai-rules-adopt/`](skills/ai-rules-adopt/SKILL.md). If your harness reads its own file, add an adapter that imports the shared content instead of copying it.
 - Keep normative rules in one place and link to them; never copy the full text twice.
 - Add stack-specific commands and tool configuration in the same change, so the rules become executable rather than aspirational.
 - Write the golden example in the language of the first project, not before.

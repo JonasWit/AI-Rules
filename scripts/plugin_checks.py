@@ -21,6 +21,7 @@ MANIFEST_PATHS = (
     ".agents/plugins/marketplace.json",
 )
 PLUGIN_RULES_PATH = "rules/AGENTS.md"
+COMMIT_MSG_HOOK_PATH = ".githooks/commit-msg"
 ANTIGRAVITY_ALLOWED_KEYS = frozenset(
     {
         "$schema",
@@ -132,6 +133,58 @@ def validate_version_sync(versions: dict[str, str]) -> list[str]:
     return [f"version mismatch across manifests: {summary}"]
 
 
+def collect_plugin_names(manifests: dict[str, dict]) -> dict[str, str]:
+    names: dict[str, str] = {}
+    for rel in (
+        ".antigravity-plugin/plugin.json",
+        ".claude-plugin/plugin.json",
+        ".codex-plugin/plugin.json",
+    ):
+        payload = manifests.get(rel)
+        if payload and isinstance(payload.get("name"), str):
+            names[rel] = payload["name"]
+    for rel in (".claude-plugin/marketplace.json", ".agents/plugins/marketplace.json"):
+        market = manifests.get(rel)
+        if market and isinstance(market.get("plugins"), list):
+            for entry in market["plugins"]:
+                if isinstance(entry, dict) and isinstance(entry.get("name"), str):
+                    names[rel] = entry["name"]
+                    break
+    return names
+
+
+def validate_name_sync(names: dict[str, str]) -> list[str]:
+    if len(set(names.values())) <= 1:
+        return []
+    summary = ", ".join(f"{path}={name}" for path, name in sorted(names.items()))
+    return [f"plugin name mismatch across manifests: {summary}"]
+
+
+def collect_manifest_paths(manifests: dict[str, dict]) -> list[tuple[str, str]]:
+    refs: list[tuple[str, str]] = []
+    codex = manifests.get(".codex-plugin/plugin.json")
+    if codex and isinstance(codex.get("skills"), str):
+        refs.append((".codex-plugin/plugin.json", codex["skills"]))
+    claude_market = manifests.get(".claude-plugin/marketplace.json")
+    if claude_market and isinstance(claude_market.get("plugins"), list):
+        for entry in claude_market["plugins"]:
+            if isinstance(entry, dict) and isinstance(entry.get("source"), str):
+                refs.append((".claude-plugin/marketplace.json", entry["source"]))
+    agents_market = manifests.get(".agents/plugins/marketplace.json")
+    if agents_market and isinstance(agents_market.get("plugins"), list):
+        for entry in agents_market["plugins"]:
+            source = entry.get("source") if isinstance(entry, dict) else None
+            if isinstance(source, dict) and isinstance(source.get("path"), str):
+                refs.append((".agents/plugins/marketplace.json", source["path"]))
+    return refs
+
+
+def validate_hook_line_endings(relative_path: str, raw_bytes: bytes) -> list[str]:
+    if b"\r\n" in raw_bytes:
+        return [f"{relative_path} must use LF line endings (CRLF breaks sh hooks)"]
+    return []
+
+
 # --- Filesystem adapter ---
 
 
@@ -197,4 +250,14 @@ def find_plugin_problems(root: Path) -> list[str] | None:
 
     versions = collect_versions(loaded, read_pyproject_version(root))
     problems.extend(validate_version_sync(versions))
+    problems.extend(validate_name_sync(collect_plugin_names(loaded)))
+
+    for manifest_rel, target in collect_manifest_paths(loaded):
+        if not (root / target).exists():
+            problems.append(f"{manifest_rel} points to missing path: {target}")
+
+    hook_file = root / COMMIT_MSG_HOOK_PATH
+    if hook_file.exists():
+        problems.extend(validate_hook_line_endings(COMMIT_MSG_HOOK_PATH, hook_file.read_bytes()))
+
     return problems

@@ -2,7 +2,7 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "ai-rules",
   "displayName": "AI Rules",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Language-agnostic engineering, testing (TDD, BDD with in-process test harness, deliberate E2E), and agent working rules that reduce AI coding mistakes.",
   "author": {
     "name": "JonasWit",

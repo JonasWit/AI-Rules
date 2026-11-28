@@ -8,31 +8,23 @@ Run with: uv run pytest
 
 from __future__ import annotations
 
-import importlib.util
 import json
-import sys
 from pathlib import Path
 
 import pytest
 
-CHECK_SCRIPT = Path(__file__).resolve().parents[1] / "check.py"
-
-
-def load_check_module():
-    spec = importlib.util.spec_from_file_location("check", CHECK_SCRIPT)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["check"] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-check = load_check_module()
-
 
 def valid_plugin_files(version: str = "1.0.0") -> dict[str, str]:
     """Return a minimal valid multi-harness plugin layout."""
+    core_concepts = (
+        "Use an in-process test harness, evaluate end-to-end (E2E) tests, "
+        "prefer vertical slice design in new apps, and respect legacy codebases.\n"
+    )
     return {
         "pyproject.toml": f'[project]\nname = "ai-rules"\nversion = "{version}"\n',
+        "README.md": f"# AI Rules\n\n{core_concepts}",
+        "docs/rules.md": f"# Rules\n\n{core_concepts}",
+        ".githooks/commit-msg": "#!/bin/sh\nexit 0\n",
         ".antigravity-plugin/plugin.json": json.dumps(
             {
                 "$schema": "https://antigravity.google/schemas/v1/plugin.json",
@@ -88,19 +80,19 @@ def valid_plugin_files(version: str = "1.0.0") -> dict[str, str]:
                 ],
             }
         ),
-        "rules/AGENTS.md": "# Agent Instructions\n\n- Test before code.\n",
+        "rules/AGENTS.md": f"# Agent Instructions\n\n- Test before code.\n- {core_concepts}",
         "skills/ai-rules/SKILL.md": (
             "---\n"
             "name: ai-rules\n"
             "description: Core engineering and testing rules.\n"
             "---\n\n"
-            "# AI Rules\n"
+            f"# AI Rules\n\n{core_concepts}"
         ),
     }
 
 
 @pytest.fixture()
-def make_plugin_repo(tmp_path: Path):
+def make_plugin_repo(tmp_path: Path, check_module):
     """Build an isolated repository with required docs and plugin bundle files."""
 
     def build(
@@ -110,7 +102,7 @@ def make_plugin_repo(tmp_path: Path):
     ) -> Path:
         root = tmp_path / "repo"
         root.mkdir()
-        for name in check.REQUIRED_FILES:
+        for name in check_module.REQUIRED_FILES:
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("# placeholder\n", encoding="utf-8")
@@ -122,52 +114,54 @@ def make_plugin_repo(tmp_path: Path):
         for name, content in files.items():
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content, encoding="utf-8")
+            path.write_bytes(content.encode("utf-8"))
         return root
 
     return build
 
 
-def run(root: Path, capsys, monkeypatch) -> tuple[int, str]:
-    monkeypatch.setenv("CHECK_SKIP_STACK", "1")
-    code = check.main(["--root", str(root)])
-    return code, capsys.readouterr().out
+@pytest.fixture()
+def run(capsys, monkeypatch, check_module):
+    def execute(root: Path) -> tuple[int, str]:
+        monkeypatch.setenv("CHECK_SKIP_STACK", "1")
+        code = check_module.main(["--root", str(root)])
+        return code, capsys.readouterr().out
+
+    return execute
 
 
-def test_valid_plugin_bundle_passes(make_plugin_repo, capsys, monkeypatch):
+def test_valid_plugin_bundle_passes(make_plugin_repo, run):
     root = make_plugin_repo()
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 0
     assert "PASS plugin manifests" in out
 
 
-def test_missing_codex_manifest_fails(make_plugin_repo, capsys, monkeypatch):
+def test_missing_codex_manifest_fails(make_plugin_repo, run):
     root = make_plugin_repo(omit=(".codex-plugin/plugin.json",))
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert ".codex-plugin/plugin.json" in out
 
 
-def test_invalid_json_in_manifest_fails(make_plugin_repo, capsys, monkeypatch):
+def test_invalid_json_in_manifest_fails(make_plugin_repo, run):
     root = make_plugin_repo(overrides={".claude-plugin/plugin.json": "{not-json"})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert ".claude-plugin/plugin.json" in out
 
 
-def test_version_mismatch_across_manifests_fails(make_plugin_repo, capsys, monkeypatch):
+def test_version_mismatch_across_manifests_fails(make_plugin_repo, run):
     bad_claude = json.dumps(
         {"name": "ai-rules", "version": "0.9.0", "description": "Stale version."}
     )
     root = make_plugin_repo(overrides={".claude-plugin/plugin.json": bad_claude})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert "version" in out.lower()
 
 
-def test_unknown_top_level_key_in_antigravity_manifest_fails(
-    make_plugin_repo, capsys, monkeypatch
-):
+def test_unknown_top_level_key_in_antigravity_manifest_fails(make_plugin_repo, run):
     bad_agy = json.dumps(
         {
             "name": "ai-rules",
@@ -177,29 +171,85 @@ def test_unknown_top_level_key_in_antigravity_manifest_fails(
         }
     )
     root = make_plugin_repo(overrides={".antigravity-plugin/plugin.json": bad_agy})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert "skills" in out
 
 
-def test_skill_frontmatter_name_must_match_directory(make_plugin_repo, capsys, monkeypatch):
+def test_skill_frontmatter_name_must_match_directory(make_plugin_repo, run):
     bad_skill = "---\nname: wrong-name\ndescription: Valid description.\n---\n\n# Body\n"
     root = make_plugin_repo(overrides={"skills/ai-rules/SKILL.md": bad_skill})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert "skills/ai-rules/SKILL.md" in out
 
 
-def test_skill_without_frontmatter_fails(make_plugin_repo, capsys, monkeypatch):
+def test_skill_without_frontmatter_fails(make_plugin_repo, run):
     root = make_plugin_repo(overrides={"skills/ai-rules/SKILL.md": "# No frontmatter\n"})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert "skills/ai-rules/SKILL.md" in out
 
 
-def test_plugin_rules_file_rejects_yaml_frontmatter(make_plugin_repo, capsys, monkeypatch):
+def test_plugin_rules_file_rejects_yaml_frontmatter(make_plugin_repo, run):
     frontmatter_rules = "---\ntrigger: always_on\n---\n\n# Rules\n"
     root = make_plugin_repo(overrides={"rules/AGENTS.md": frontmatter_rules})
-    code, out = run(root, capsys, monkeypatch)
+    code, out = run(root)
     assert code == 1
     assert "rules/AGENTS.md" in out
+
+
+def test_manifest_pointing_to_missing_path_fails(make_plugin_repo, run):
+    bad_codex = json.dumps(
+        {
+            "name": "ai-rules",
+            "version": "1.0.0",
+            "description": "Points to missing skills dir.",
+            "skills": "./missing-skills/",
+        }
+    )
+    root = make_plugin_repo(overrides={".codex-plugin/plugin.json": bad_codex})
+    code, out = run(root)
+    assert code == 1
+    assert "missing-skills" in out
+
+
+def test_plugin_name_mismatch_across_manifests_fails(make_plugin_repo, run):
+    bad_codex = json.dumps(
+        {
+            "name": "wrong-plugin",
+            "version": "1.0.0",
+            "description": "Mismatched plugin name.",
+            "skills": "./skills/",
+        }
+    )
+    root = make_plugin_repo(overrides={".codex-plugin/plugin.json": bad_codex})
+    code, out = run(root)
+    assert code == 1
+    assert "name mismatch" in out.lower()
+
+
+def test_commit_msg_hook_with_crlf_fails(make_plugin_repo, run):
+    root = make_plugin_repo(overrides={".githooks/commit-msg": "#!/bin/sh\r\nexit 0\r\n"})
+    code, out = run(root)
+    assert code == 1
+    assert ".githooks/commit-msg" in out
+
+
+def test_missing_core_concept_in_carrier_fails(make_plugin_repo, run):
+    incomplete_skill = (
+        "---\nname: ai-rules\ndescription: Incomplete skill.\n---\n\n"
+        "Use an in-process test harness, end-to-end (E2E) tests, and respect legacy code.\n"
+    )
+    root = make_plugin_repo(overrides={"skills/ai-rules/SKILL.md": incomplete_skill})
+    code, out = run(root)
+    assert code == 1
+    assert "vertical slice" in out
+    assert "skills/ai-rules/SKILL.md" in out
+
+
+def test_all_carriers_mention_every_concept_passes(make_plugin_repo, run):
+    root = make_plugin_repo()
+    code, out = run(root)
+    assert code == 0
+    assert "PASS concept sync" in out

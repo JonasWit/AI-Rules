@@ -5,12 +5,14 @@
 ## Definition of done
 
 - [ ] The test existed before the implementation and I saw its red result
+- [ ] Behavioral tests through the in-process test harness cover the boundary where applicable; E2E coverage was evaluated and any trade-off stated
 - [ ] `uv run python scripts/check.py` passes — raw output pasted below
 - [ ] Every claim about behavior names the test that proves it
 - [ ] No refactors along the way and no `TODO` left in code
 - [ ] Any new pattern recorded in `docs/decisions.md`
 - [ ] No dependency added without justification
 - [ ] Documentation updated in the same commit when the change requires it
+- [ ] For a release: version synchronized in `pyproject.toml`, `uv.lock`, and all plugin manifests
 
 ## Evidence
 

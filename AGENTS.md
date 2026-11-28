@@ -45,8 +45,14 @@ Read these before editing anything:
 - Find an existing pattern and follow it. A new pattern means a new entry in
   `docs/decisions.md` in the same change.
 - One change, one purpose. No drive-by refactors, no leftover TODOs.
-- Ask questions through the structured question tool, never in plain prose.
+- Ask questions with concrete options and the recommended option first.
 - Report what you could not verify. Silence about uncertainty is a false claim.
+
+## Release checklist (local)
+
+- Confirm `git config --get core.hooksPath` returns `.githooks`.
+- Synchronize `version` across `pyproject.toml`, `uv.lock`, and all plugin manifests.
+- Run `uv run python scripts/check.py` and keep the raw passing output as evidence before tagging.
 
 ## Structure
 

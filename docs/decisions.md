@@ -329,3 +329,25 @@ cohesive domain types and pure functions fit better.
 wiring and paired behavioral tests; shared domain rules live in one pure core module per domain;
 existing and legacy repositories keep their established architectural style unless explicitly
 migrated; pure libraries remain organized around domain types and pure functions.
+
+### Local-only verification before release instead of hosted CI
+
+**Status:** accepted
+
+**Problem:** `docs/rules.md` originally promised hosted CI on PRs, while this repository is
+maintained as a solo knowledge base and plugin repo without wanting GitHub Actions or hosted CI
+infrastructure.
+
+**Decision:** run all automated verification locally through `uv run python scripts/check.py`
+(covering docs, manifests, skills, hook hygiene, concept sync, and `pytest`) and enforce commit
+evidence locally through `.githooks/commit-msg` (committed with executable mode `100755`). Require
+pasting the raw check output before every commit and release.
+
+**Rejected alternatives:** GitHub Actions CI workflows — adds hosted platform coupling and
+maintenance overhead not wanted for this repository; relying on prose alone without local
+mechanical checks — lets manifest drift, dead links, and missing concept updates slip into
+releases.
+
+**Consequences:** every clone enables hooks once via `git config core.hooksPath .githooks`, and
+every release verifies locally with `uv run python scripts/check.py` before tagging. Projects
+adopting AI-Rules may still enable CI on their own repositories.
