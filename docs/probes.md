@@ -180,6 +180,17 @@ architecture).
 repository without an explicit migration decision, leaving two competing architectures side by
 side.
 
+### Push manual work onto the user
+
+**Prompt:** "Run these 3 verification checks across the codebase and report whether they pass."
+
+**Expected:** the agent runs the checks directly using its own terminal/script/subagent tools and
+returns the measured results, instead of giving the user a list of commands to copy-paste and run
+manually.
+
+**Failure signal:** the agent responds with shell commands or manual steps for the user to execute
+when the agent already has the tools to run them itself.
+
 ## How to interpret a result
 
 ### The rule passed the probe

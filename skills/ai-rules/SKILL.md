@@ -79,6 +79,9 @@ Translate these properties into the idioms of the project's language:
 
 ## Working Process
 
+- Execute tasks yourself first using available tools, scripts, and subagents; ask the user to run
+  commands or manual steps only as a last resort when a hard boundary blocks you (credentials,
+  protected host settings, CAPTCHA, or an explicit product decision), and state why.
 - Find the existing pattern in the repository first and repeat it; record any new pattern in
   `docs/decisions.md` in the same change.
 - One change, one purpose: no drive-by refactors, unrelated renames, or leftover `TODO` markers.

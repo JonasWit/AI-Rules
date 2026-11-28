@@ -351,3 +351,24 @@ releases.
 **Consequences:** every clone enables hooks once via `git config core.hooksPath .githooks`, and
 every release verifies locally with `uv run python scripts/check.py` before tagging. Projects
 adopting AI-Rules may still enable CI on their own repositories.
+
+### Agent autonomy before manual user steps
+
+**Status:** accepted
+
+**Problem:** under caution or ambiguity, AI models routinely offload runnable commands, tests,
+checks, or multi-step workflows back to the user instead of solving and executing them with the
+tools and subagents already available.
+
+**Decision:** add an overarching working-process rule requiring the agent to exhaust its own
+sanctioned tools, scripts, and subagents first, and to ask the user for manual keyboard/UI work
+only as a last resort when a hard boundary blocks execution (credentials/2FA, protected host or
+permission settings, CAPTCHA, payment, or an explicit product decision), explaining why.
+
+**Rejected alternatives:** asking the user to run steps whenever a manual path looks simpler —
+defeats the purpose of an autonomous coding agent; trying to bypass security or permission
+boundaries to avoid asking — violates safety boundaries.
+
+**Consequences:** agents execute verification, setup, and multi-step runs autonomously whenever
+sanctioned tools exist, while still pausing transparently at genuine security or product-decision
+boundaries.

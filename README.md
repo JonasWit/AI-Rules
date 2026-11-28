@@ -138,6 +138,7 @@ CLAUDE.md             thin Claude Code adapter: imports AGENTS.md
 - **Test before code.** Always, except changes with no executable behavior.
 - **A claim requires a test.** Label a judgment ("this is clearer") as a judgment, not as proof.
 - **One change, one purpose.** No refactors along the way.
+- **Do the work yourself first.** Exhaust available tools, scripts, and subagents before asking the user to run manual steps; hand off manual work only as a last resort when a real boundary blocks you.
 
 ### Architecture
 

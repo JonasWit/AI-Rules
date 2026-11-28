@@ -19,6 +19,8 @@
 - Do not guess APIs. Types or documentation first, code second.
 - One purpose per change: no refactors along the way, no leftover TODOs.
 - Find the existing pattern in the repository first, then repeat it.
+- Execute tasks yourself using available tools, scripts, and subagents; ask the user to perform
+  manual steps only as a last resort when a hard boundary blocks you.
 - Before calling a task done, run the project check command (here:
   `uv run python scripts/check.py`) and show the raw output.
 - A rule that cannot be checked mechanically will be broken sooner or later.
@@ -498,6 +500,17 @@ with the reason and consequences.
 
 The agent points out places it has not verified with a test and risks it cannot rule out. Silence
 about uncertainty is a report of false certainty.
+
+### Exhaust your own tools before asking the user to act manually
+
+Do not hand work back to the user that you can execute yourself. Before telling the user to run a
+command, open extra chats, click through a workflow, or manually test something, find a sanctioned
+way to execute and verify it yourself using available tools, scripts, or subagents.
+
+Ask the user to perform a manual step only as a last resort — when a genuine boundary blocks you
+(such as interactive login/2FA, payment, CAPTCHA, protected host or permission settings, or an
+explicit product decision) — and state concretely why you could not do it yourself. Never bypass
+security or permission boundaries to work around a block.
 
 ## Definition of done
 

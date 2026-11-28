@@ -45,6 +45,7 @@ Repository-level instructions and `docs/rules.md` tighten these defaults; reposi
 
 ## Working process
 
+- Execute tasks yourself first using available tools, scripts, and subagents; ask the user to run commands or manual steps only as a last resort when a hard boundary blocks you (e.g., credentials, protected host settings, CAPTCHA, or an explicit product decision), and state why.
 - Find the existing pattern in the repository first and repeat it.
 - Record every new pattern in `docs/decisions.md` in the same change.
 - One change, one purpose. No drive-by refactorings, unrelated renames, or leftover `TODO`s; report unrelated issues separately.
